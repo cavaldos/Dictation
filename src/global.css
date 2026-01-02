@@ -1,0 +1,217 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Notion-style color variables */
+:root {
+  /* Main Color Palette - 3 màu chủ đạo */
+  --notion-bg-main: rgb(25, 25, 25);        /* Background chính */
+  --notion-bg-secondary: rgb(32, 32, 32);   /* Sidebar, header, cards */
+  --notion-bg-hover: rgb(49, 49, 49);       /* Hover state */
+  --notion-border: rgb(56, 56, 56);         /* Border lines */
+  --notion-text: rgb(240, 240, 240);        /* Text chính */
+  --notion-text-muted: rgb(142, 142, 142);  /* Text mờ khi không active */
+  
+  /* Shadcn/UI Variables - mapped to Notion colors */
+  --background: oklch(0.098 0 0);              /* rgb(25, 25, 25) */
+  --foreground: oklch(0.941 0 0);              /* rgb(240, 240, 240) */
+  --card: oklch(0.125 0 0);                    /* rgb(32, 32, 32) */
+  --card-foreground: oklch(0.941 0 0);         /* rgb(240, 240, 240) */
+  --popover: oklch(0.125 0 0);                 /* rgb(32, 32, 32) */
+  --popover-foreground: oklch(0.941 0 0);      /* rgb(240, 240, 240) */
+  --primary: oklch(0.608 0.201 251.401);       /* Blue */
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.192 0 0);               /* rgb(49, 49, 49) */
+  --secondary-foreground: oklch(0.941 0 0);    /* rgb(240, 240, 240) */
+  --muted: oklch(0.192 0 0);                   /* rgb(49, 49, 49) */
+  --muted-foreground: oklch(0.608 0 0);        /* rgb(155, 155, 155) */
+  --accent: oklch(0.192 0 0);                  /* rgb(49, 49, 49) */
+  --accent-foreground: oklch(0.941 0 0);       /* rgb(240, 240, 240) */
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.22 0 0);                   /* rgb(56, 56, 56) */
+  --input: oklch(0.22 0 0);                    /* rgb(56, 56, 56) */
+  --ring: oklch(0.608 0.201 251.401);
+  --radius: 8px;  /* Default border radius */
+  
+  /* Sidebar */
+  --sidebar: oklch(0.125 0 0);                 /* rgb(32, 32, 32) */
+  --sidebar-foreground: oklch(0.941 0 0);      /* rgb(240, 240, 240) */
+  --sidebar-primary: oklch(0.608 0.201 251.401);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.192 0 0);          /* rgb(49, 49, 49) */
+  --sidebar-accent-foreground: oklch(0.941 0 0); /* rgb(240, 240, 240) */
+  --sidebar-border: oklch(0.22 0 0);           /* rgb(56, 56, 56) */
+  --sidebar-ring: oklch(0.608 0.201 251.401);
+}
+
+@theme inline {
+  /* Notion Custom Colors */
+  --color-notion-main: var(--notion-bg-main);
+  --color-notion-secondary: var(--notion-bg-secondary);
+  --color-notion-hover: var(--notion-bg-hover);
+  --color-notion-border: var(--notion-border);
+  --color-notion-text: var(--notion-text);
+  --color-notion-text-muted: var(--notion-text-muted);
+  
+  /* Legacy Notion colors */
+  --color-notion-grey: rgb(32, 32, 32);
+  --color-notion-dark: rgb(25, 25, 25);
+  
+  /* VS Code colors */
+  --color-vscode-blue-300: #7ecbff;
+  --color-vscode-blue-400: #3fb0ff;
+  --color-vscode-blue-500: #0a84ff;
+  --color-vscode-green: #89d185;
+  
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+  --radius-DEFAULT: 8px;
+  
+  /* Shadcn/UI Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Utility classes for easier usage */
+@layer utilities {
+  /* Notion background colors */
+  .bg-notion-main { background-color: var(--notion-bg-main); }
+  .bg-notion-secondary { background-color: var(--notion-bg-secondary); }
+  .bg-notion-hover { background-color: var(--notion-bg-hover); }
+  
+  /* Notion text colors */
+  .text-notion { color: var(--notion-text); }
+  .text-notion-muted { color: var(--notion-text-muted); }
+  
+  /* Notion border colors */
+  .border-notion { border-color: var(--notion-border); }
+  
+  /* Hover utilities */
+  .hover\:bg-notion-hover:hover { background-color: var(--notion-bg-hover); }
+  .hover\:text-notion:hover { color: var(--notion-text); }
+}
+
+@layer base {
+  /* Reset */
+  * {
+    @apply border-border outline-ring/50;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Root & Body */
+  html {
+    background-color: var(--notion-bg-main);
+    color-scheme: dark;
+    overflow: hidden;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+  }
+  
+  /* macOS Title Bar Drag Region */
+  .titlebar-drag-region {
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+  
+  .titlebar-no-drag {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+  
+  /* Custom Scrollbar - Notion Style */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  /* Selection */
+  ::selection {
+    background: rgba(46, 170, 220, 0.4);
+    color: inherit;
+  }
+  
+  /* Focus visible */
+  *:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  
+  /* Smooth transitions */
+  button, a {
+    transition: all 0.15s ease-in-out;
+  }
+  
+  /* Input & Textarea defaults */
+  input, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  
+  /* Button reset */
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+}
