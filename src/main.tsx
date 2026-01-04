@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client'
 import './global.css'
 import App from './App.tsx'
 import { ThemeProvider } from '~/redux/ThemeProvider';
-
+import ProviderGlobal from './redux/provider.tsx';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
+    <ProviderGlobal>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </ProviderGlobal>
   </StrictMode>,
 )
