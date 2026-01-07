@@ -125,6 +125,16 @@
   /* Hover utilities */
   .hover\:bg-notion-hover:hover { background-color: var(--notion-bg-hover); }
   .hover\:text-notion:hover { color: var(--notion-text); }
+  
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
 }
 
 @layer base {

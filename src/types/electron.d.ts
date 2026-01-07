@@ -27,5 +27,9 @@ interface Window {
     platform: string
     fetchYoutubeCaptions: (videoId: string) => Promise<FetchCaptionsResult>
     fetchYoutubeSubtitles: (videoId: string, lang: string) => Promise<FetchSubtitlesResult>
+    // Electron store methods for redux-persist
+    storeGet: (key: string) => Promise<string | null>
+    storeSet: (key: string, value: string) => Promise<boolean>
+    storeRemove: (key: string) => Promise<boolean>
   }
 }

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Check, SkipForward, ChevronRight, Eye, EyeOff } from 'lucide-react';
-import type { SubtitleItem } from '~/services/youtube.service';
-import { compareTexts, compareWordsDetailed, type WordComparison } from '~/services/youtube.service';
-import { useSettings } from '~/context/SettingsContext';
+import type { SubtitleItem } from '~/utils/youtube.service';
+import { compareTexts, compareWordsDetailed, type WordComparison } from '~/utils/youtube.service';
+import { useSettings } from '~/hooks/useReduxHooks';
 
 interface DictationInputProps {
   subtitles: SubtitleItem[];
@@ -48,7 +48,7 @@ const DictationInput: React.FC<DictationInputProps> = ({
     setIsCorrect(result.isCorrect);
     setAccuracy(result.accuracy);
     setShowResult(true);
-    
+
     // Generate word comparison for wrong answers
     if (!result.isCorrect) {
       const comparison = compareWordsDetailed(currentSubtitle.text, userInput);
@@ -101,7 +101,7 @@ const DictationInput: React.FC<DictationInputProps> = ({
           <span>{currentIndex + 1} / {subtitles.length}</span>
         </div>
         <div className="h-2 bg-notion-secondary rounded-full overflow-hidden">
-          <div 
+          <div
             className="h-full bg-primary transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
@@ -109,7 +109,7 @@ const DictationInput: React.FC<DictationInputProps> = ({
       </div>
 
       {/* Dictation Card */}
-      <div className="bg-notion-secondary rounded-xl p-6 shadow-lg">
+      <div className="bg-notion-secondary rounded-lg p-6 shadow-lg">
         {/* Time indicator + Loop hint */}
         <div className="flex justify-between items-center mb-4">
           <div className="text-xs text-notion-text-muted">
@@ -127,21 +127,19 @@ const DictationInput: React.FC<DictationInputProps> = ({
               <span className="text-xs text-yellow-500/80">Translation hint:</span>
               <button
                 onClick={() => setBlurTranslation(!blurTranslation)}
-                className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors ${
-                  blurTranslation 
-                    ? 'text-notion-text-muted hover:text-notion-text' 
-                    : 'bg-yellow-500/20 text-yellow-500'
-                }`}
+                className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors ${blurTranslation
+                  ? 'text-notion-text-muted hover:text-notion-text'
+                  : 'bg-yellow-500/20 text-yellow-500'
+                  }`}
                 title={blurTranslation ? 'Show translation' : 'Hide translation'}
               >
                 {blurTranslation ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                 {blurTranslation ? 'Show' : 'Hide'}
               </button>
             </div>
-            <div 
-              className={`text-sm text-yellow-500/80 transition-all duration-200 cursor-pointer ${
-                blurTranslation ? 'blur-sm hover:blur-none' : ''
-              }`}
+            <div
+              className={`text-sm text-yellow-500/80 transition-all duration-200 cursor-pointer ${blurTranslation ? 'blur-sm hover:blur-none' : ''
+                }`}
               onClick={() => setBlurTranslation(!blurTranslation)}
             >
               {currentSubtitle.translatedText}
@@ -158,13 +156,12 @@ const DictationInput: React.FC<DictationInputProps> = ({
             onKeyDown={handleKeyDown}
             placeholder="Type what you hear..."
             disabled={showResult && isCorrect}
-            className={`w-full h-24 p-4 bg-notion-main rounded-lg border-2 text-notion-text placeholder:text-notion-text-muted resize-none focus:outline-none transition-colors ${
-              showResult
-                ? isCorrect
-                  ? 'border-green-500'
-                  : 'border-red-500'
-                : 'border-notion-border focus:border-primary'
-            }`}
+            className={`w-full h-24 p-4 bg-notion-main rounded-lg border-2 text-notion-text placeholder:text-notion-text-muted resize-none focus:outline-none transition-colors ${showResult
+              ? isCorrect
+                ? 'border-green-500'
+                : 'border-red-500'
+              : 'border-notion-border focus:border-primary'
+              }`}
           />
         </div>
 
@@ -179,7 +176,7 @@ const DictationInput: React.FC<DictationInputProps> = ({
                 ({accuracy}% accuracy)
               </span>
             </div>
-            
+
             {/* Word-by-word comparison for wrong answers */}
             {!isCorrect && wordComparison.length > 0 && (
               <div className="mb-3 p-3 bg-notion-main rounded-lg">
@@ -188,15 +185,14 @@ const DictationInput: React.FC<DictationInputProps> = ({
                   {wordComparison.map((item, index) => (
                     <span
                       key={index}
-                      className={`inline-block px-1.5 py-0.5 rounded text-sm ${
-                        item.isCorrect
-                          ? 'bg-green-500/20 text-green-400'
-                          : item.isMissing
-                            ? 'bg-yellow-500/20 text-yellow-400 line-through'
-                            : item.isExtra
-                              ? 'bg-red-500/20 text-red-400 line-through'
-                              : 'bg-red-500/20 text-red-400'
-                      }`}
+                      className={`inline-block px-1.5 py-0.5 rounded text-sm ${item.isCorrect
+                        ? 'bg-green-500/20 text-green-400'
+                        : item.isMissing
+                          ? 'bg-yellow-500/20 text-yellow-400 line-through'
+                          : item.isExtra
+                            ? 'bg-red-500/20 text-red-400 line-through'
+                            : 'bg-red-500/20 text-red-400'
+                        }`}
                       title={
                         item.isMissing
                           ? `Missing: "${item.expected}"`
@@ -221,12 +217,12 @@ const DictationInput: React.FC<DictationInputProps> = ({
                 </div>
               </div>
             )}
-            
+
             <div className="text-notion-text">
               <span className="text-notion-text-muted text-sm">Correct answer: </span>
               <span className="text-notion-text">{currentSubtitle.text}</span>
             </div>
-            
+
             {/* Show translation after checking */}
             {hasTranslation && (
               <div className="mt-2 text-notion-text">

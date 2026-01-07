@@ -1,6 +1,6 @@
 import React from 'react';
 import { Settings, RotateCcw, Clock, Target, Gauge, Type } from 'lucide-react';
-import { useSettings } from '~/context/SettingsContext';
+import { useSettings } from '~/hooks/useReduxHooks';
 
 const SettingPage: React.FC = () => {
   const { settings, updateSettings, resetSettings } = useSettings();
@@ -17,12 +17,12 @@ const SettingPage: React.FC = () => {
         {/* Settings Sections */}
         <div className="space-y-6">
           {/* Subtitle Settings */}
-          <section className="bg-notion-secondary rounded-xl p-6">
+          <section className="bg-notion-secondary rounded-lg p-6">
             <h2 className="text-lg font-semibold text-notion-text mb-4 flex items-center gap-2">
               <Type className="w-5 h-5" />
               Subtitle Settings
             </h2>
-            
+
             <div className="space-y-4">
               {/* Min Words per Subtitle */}
               <div>
@@ -52,12 +52,12 @@ const SettingPage: React.FC = () => {
           </section>
 
           {/* Practice Settings */}
-          <section className="bg-notion-secondary rounded-xl p-6">
+          <section className="bg-notion-secondary rounded-lg p-6">
             <h2 className="text-lg font-semibold text-notion-text mb-4 flex items-center gap-2">
               <Target className="w-5 h-5" />
               Practice Settings
             </h2>
-            
+
             <div className="space-y-4">
               {/* Accuracy Threshold */}
               <div>
@@ -116,12 +116,12 @@ const SettingPage: React.FC = () => {
           </section>
 
           {/* Playback Settings */}
-          <section className="bg-notion-secondary rounded-xl p-6">
+          <section className="bg-notion-secondary rounded-lg p-6">
             <h2 className="text-lg font-semibold text-notion-text mb-4 flex items-center gap-2">
               <Gauge className="w-5 h-5" />
               Playback Settings
             </h2>
-            
+
             <div className="space-y-4">
               {/* Playback Speed */}
               <div>
@@ -166,7 +166,7 @@ const SettingPage: React.FC = () => {
           </div>
 
           {/* Current Values Reference */}
-          <section className="bg-notion-main rounded-xl p-4 border border-notion-border">
+          <section className="bg-notion-main rounded-lg p-4 border border-notion-border">
             <h3 className="text-sm font-medium text-notion-text-muted mb-2">Current Values</h3>
             <div className="grid grid-cols-2 gap-2 text-xs font-mono">
               <div>

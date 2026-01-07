@@ -2,12 +2,12 @@ import React, { Fragment } from 'react';
 
 import MainRoute from './routes';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { SettingsModal } from '~/components/Setting';
 import '~/global.css';
+
 const App: React.FC = () => {
-
   return (
-    <BrowserRouter >
-
+    <BrowserRouter>
       {/* <Suspense fallback={<Loading />}> */}
       <Routes>
         {MainRoute.map((route, index) => {
@@ -35,6 +35,9 @@ const App: React.FC = () => {
         />
       </Routes>
       {/* </Suspense> */}
+      
+      {/* Global Settings Modal */}
+      <SettingsModal />
     </BrowserRouter>
   );
 }

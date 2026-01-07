@@ -1,16 +1,16 @@
 import { lazy } from 'react';
 
 const MainLayout = lazy(() => import('~/components/Layout/main.layout'));
-const HomePage = lazy(() => import('~/pages/home.page'));
+const DictationPage = lazy(() => import('~/pages/dictation.page'));
 const SettingPage = lazy(() => import('~/pages/setting.page'));
-const AgentPage = lazy(() => import('~/pages/agent.page'));
+const ArchivePage = lazy(() => import('~/pages/archive.page'));
 const Router = [
     {
-        name: 'Dashboard',
+        name: '',
         icon: '',
         path: '/',
-        component: HomePage,
-        Layout: MainLayout,
+        component: DictationPage,
+        Layout: null,
     },
     {
         name: 'Setting',
@@ -20,17 +20,17 @@ const Router = [
         Layout: MainLayout,
     },
     {
-        name: 'Agent',
+        name: 'Archive',
         icon: '',
-        path: '/agent',
-        component: AgentPage,
-        Layout: MainLayout,
+        path: '/archive',
+        component: ArchivePage,
+        Layout: null,
     },
     {
         name: 'Carbin',
         icon: '',
         path: '/carbin',
-        component: AgentPage,
+        component: () => <h1>Carbin Page</h1>,
         Layout: MainLayout,
     },
 

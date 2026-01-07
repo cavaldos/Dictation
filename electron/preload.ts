@@ -30,4 +30,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('fetch-youtube-captions', videoId),
   fetchYoutubeSubtitles: (videoId: string, lang: string): Promise<FetchSubtitlesResult> =>
     ipcRenderer.invoke('fetch-youtube-subtitles', videoId, lang),
+  // Electron store methods for redux-persist
+  storeGet: (key: string): Promise<string | null> =>
+    ipcRenderer.invoke('electron-store-get', key),
+  storeSet: (key: string, value: string): Promise<boolean> =>
+    ipcRenderer.invoke('electron-store-set', key, value),
+  storeRemove: (key: string): Promise<boolean> =>
+    ipcRenderer.invoke('electron-store-remove', key),
 })

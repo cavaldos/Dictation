@@ -1,4 +1,10 @@
 import countSlice from './features/countSlice';
+import dictationArchiveSlice from './features/dictationArchiveSlice';
+import dictationSlice from './features/dictationSlice';
+import noteSlice from './features/noteSlice';
+import settingsSlice from './features/settingsSlice';
+import sidebarSlice from './features/sidebarSlice';
+import videoPlayerSlice from './features/videoPlayerSlice';
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
     persistStore,
@@ -10,15 +16,22 @@ import {
     PURGE,
     REGISTER,
 } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import electronStorage from './electronStorage';
+
 const persistConfig = {
     key: 'root',
     version: 1,
-    storage,
-    whitelist: [''], // Only persist the auth slice
+    storage: electronStorage,
+    whitelist: ['dictationArchive', 'sidebar', 'videoPlayer', 'settings', 'notes'], // Persist slices
 };
 const rootReducer = combineReducers({
     count: countSlice,
+    dictation: dictationSlice,
+    dictationArchive: dictationArchiveSlice,
+    notes: noteSlice,
+    settings: settingsSlice,
+    sidebar: sidebarSlice,
+    videoPlayer: videoPlayerSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

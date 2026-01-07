@@ -5,9 +5,8 @@ import type { YouTubePlayer } from "react-youtube";
 import VideoPlayer, { type VideoPlayerRef } from "~/components/Dictation/VideoPlayer";
 import DictationInput from "~/components/Dictation/DictationInput";
 import DropZone from "~/components/UI/DropZone";
-import { extractVideoId, parseSRTRaw, mergeSubtitlesWithTranslation } from "~/services/youtube.service";
-import { useDictation } from "~/context/DictationContext";
-import { useSettings } from "~/context/SettingsContext";
+import { extractVideoId, parseSRTRaw, mergeSubtitlesWithTranslation } from "~/utils/youtube.service";
+import { useDictation, useSettings } from "~/hooks/useReduxHooks";
 import { useKeyboardShortcuts } from "~/hooks/useKeyboardShortcuts";
 
 const HomePage: React.FC = () => {
@@ -25,12 +24,12 @@ const HomePage: React.FC = () => {
 
   const { settings } = useSettings();
 
-  const { 
-    subtitles, 
-    setSubtitles, 
-    currentIndex, 
+  const {
+    subtitles,
+    setSubtitles,
+    currentIndex,
     setCurrentIndex,
-    isStarted, 
+    isStarted,
     setIsStarted,
     markCompleted,
     findSubtitleByTime,
@@ -202,11 +201,11 @@ const HomePage: React.FC = () => {
   const handleCorrect = () => {
     setIsLooping(false);
     markCompleted(currentIndex);
-    
+
     if (currentIndex < subtitles.length - 1) {
       const nextIndex = currentIndex + 1;
       setCurrentIndex(nextIndex);
-      
+
       setTimeout(() => {
         setIsLooping(true);
       }, 300);
@@ -218,11 +217,11 @@ const HomePage: React.FC = () => {
 
   const handleSkip = () => {
     setIsLooping(false);
-    
+
     if (currentIndex < subtitles.length - 1) {
       const nextIndex = currentIndex + 1;
       setCurrentIndex(nextIndex);
-      
+
       setTimeout(() => {
         setIsLooping(true);
       }, 300);
@@ -358,7 +357,7 @@ const HomePage: React.FC = () => {
             <p className="text-notion-text-muted mb-6">
               Click start to begin dictation.
             </p>
-            
+
             <div className="flex gap-4 justify-center">
               <button
                 onClick={handleStart}
@@ -367,7 +366,7 @@ const HomePage: React.FC = () => {
                 <Play className="w-5 h-5" />
                 Start Dictation
               </button>
-              
+
               <button
                 onClick={resetAll}
                 className="px-6 py-3 bg-notion-secondary rounded-lg text-notion-text hover:bg-notion-hover transition-colors"
@@ -413,7 +412,7 @@ const HomePage: React.FC = () => {
             <Keyboard className="w-4 h-4" />
             {showShortcuts ? 'Hide' : 'Show'} keyboard shortcuts
           </button>
-          
+
           {showShortcuts && (
             <div className="mt-3 p-4 bg-notion-secondary rounded-lg border border-notion-border">
               <div className="grid grid-cols-2 gap-3 text-sm">

@@ -2,8 +2,15 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getSubtitles } from 'youtube-captions-scraper'
+import Store from 'electron-store'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// Initialize electron-store for persistent storage
+const store = new Store({
+  name: 'redux-persist',
+  defaults: {}
+})
 
 process.env.DIST_ELECTRON = path.join(__dirname, '..')
 process.env.DIST = path.join(__dirname, '../dist-electron')
@@ -67,6 +74,37 @@ ipcMain.handle('fetch-youtube-subtitles', async (_event, videoId: string, lang: 
   } catch (error) {
     console.error('Failed to fetch subtitles:', error)
     return { success: false, subtitles: [], error: `Could not fetch subtitles for language: ${lang}` }
+  }
+})
+
+// IPC handlers for electron-store (redux-persist storage)
+ipcMain.handle('electron-store-get', async (_event, key: string) => {
+  try {
+    const value = store.get(key)
+    return value !== undefined ? JSON.stringify(value) : null
+  } catch (error) {
+    console.error('electron-store-get error:', error)
+    return null
+  }
+})
+
+ipcMain.handle('electron-store-set', async (_event, key: string, value: string) => {
+  try {
+    store.set(key, JSON.parse(value))
+    return true
+  } catch (error) {
+    console.error('electron-store-set error:', error)
+    return false
+  }
+})
+
+ipcMain.handle('electron-store-remove', async (_event, key: string) => {
+  try {
+    store.delete(key)
+    return true
+  } catch (error) {
+    console.error('electron-store-remove error:', error)
+    return false
   }
 })
 

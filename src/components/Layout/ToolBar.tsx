@@ -1,10 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-import { PanelLeft, PanelRight, ChevronDown } from "lucide-react";
+import React from "react";
+import { PanelLeft, PanelRight, Settings } from "lucide-react";
+import { useDispatch } from "react-redux";
 import NavSelection from "./NavSelection";
+import { openSettingsModal } from "~/redux/features/settingsSlice";
 
 interface ToolBarProps {
     showLeftSide: boolean;
     showRightSide: boolean;
+    hasLeftSide?: boolean;
+    hasRightSide?: boolean;
     onToggleLeftSide: () => void;
     onToggleRightSide: () => void;
 }
@@ -12,11 +16,15 @@ interface ToolBarProps {
 const ToolBar: React.FC<ToolBarProps> = ({
     showLeftSide,
     showRightSide,
+    hasLeftSide = true,
+    hasRightSide = true,
     onToggleLeftSide,
     onToggleRightSide,
 }) => {
+    const dispatch = useDispatch();
+
     return (
-        <header className={`h-9 w-full flex items-center justify-between bg-[rgb(25,25,25)] px-2 select-none custom-drag-region transition-all duration-200 ${showLeftSide === false ? 'pl-20' : ''}`}>
+        <header className={`h-9 w-full flex items-center justify-between bg-[rgb(25,25,25)] px-2 select-none custom-drag-region transition-all duration-200`}>
             {/* Left section */}
             <NavSelection />
 
@@ -28,25 +36,37 @@ const ToolBar: React.FC<ToolBarProps> = ({
             {/* Right section - Layout toggles */}
             <div className="flex items-center gap-2 w-[200px] justify-end">
                 <div className="flex items-center gap-0.5">
+                    {hasLeftSide && (
+                        <button
+                            onClick={onToggleLeftSide!}
+                            title="Toggle left sidebar"
+                            className={`p-1.5 rounded transition-colors titlebar-no-drag ${showLeftSide
+                                ? "bg-[rgb(70,70,70)] text-[rgb(240,240,240)]"
+                                : "text-[rgb(142,142,142)] hover:bg-[rgb(49,49,49)] hover:text-[rgb(200,200,200)]"
+                                }`}
+                        >
+                            <PanelLeft size={16} />
+                        </button>
+                    )}
+                    {hasRightSide && (
+                        <button
+                            onClick={onToggleRightSide}
+                            title="Toggle right sidebar"
+                            className={`p-1.5 rounded transition-colors titlebar-no-drag ${showRightSide
+                                ? "bg-[rgb(70,70,70)] text-[rgb(240,240,240)]"
+                                : "text-[rgb(142,142,142)] hover:bg-[rgb(49,49,49)] hover:text-[rgb(200,200,200)]"
+                                }`}
+                        >
+                            <PanelRight size={16} />
+                        </button>
+                    )}
+                    {/* Settings button */}
                     <button
-                        onClick={onToggleLeftSide}
-                        title="Toggle left sidebar"
-                        className={`p-1.5 rounded transition-colors titlebar-no-drag ${showLeftSide
-                            ? "bg-[rgb(70,70,70)] text-[rgb(240,240,240)]"
-                            : "text-[rgb(142,142,142)] hover:bg-[rgb(49,49,49)] hover:text-[rgb(200,200,200)]"
-                            }`}
+                        onClick={() => dispatch(openSettingsModal())}
+                        title="Settings"
+                        className="p-1.5 rounded transition-colors titlebar-no-drag text-[rgb(142,142,142)] hover:bg-[rgb(49,49,49)] hover:text-[rgb(200,200,200)]"
                     >
-                        <PanelLeft size={16} />
-                    </button>
-                    <button
-                        onClick={onToggleRightSide}
-                        title="Toggle right sidebar"
-                        className={`p-1.5 rounded transition-colors titlebar-no-drag ${showRightSide
-                            ? "bg-[rgb(70,70,70)] text-[rgb(240,240,240)]"
-                            : "text-[rgb(142,142,142)] hover:bg-[rgb(49,49,49)] hover:text-[rgb(200,200,200)]"
-                            }`}
-                    >
-                        <PanelRight size={16} />
+                        <Settings size={16} />
                     </button>
                 </div>
             </div>
