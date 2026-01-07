@@ -37,4 +37,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('electron-store-set', key, value),
   storeRemove: (key: string): Promise<boolean> =>
     ipcRenderer.invoke('electron-store-remove', key),
+  // AI Chat methods
+  getAIProviders: () =>
+    ipcRenderer.invoke('get-ai-providers'),
+  setAIProvider: (providerId: string) =>
+    ipcRenderer.invoke('set-ai-provider', providerId),
+  fetchAIModels: (providerId: string) =>
+    ipcRenderer.invoke('fetch-ai-models', providerId),
+  setAIModel: (providerId: string, modelId: string) =>
+    ipcRenderer.invoke('set-ai-model', providerId, modelId),
+  chatWithAIStream: (history: Array<{role: string, content: string}>, message: string) =>
+    ipcRenderer.invoke('chat-with-ai-stream', history, message),
+  onAIChatChunk: (callback: (chunk: string) => void) => {
+    ipcRenderer.on('ai-chat-chunk', (_event, chunk) => callback(chunk))
+  },
+  removeAIChatChunkListener: () => {
+    ipcRenderer.removeAllListeners('ai-chat-chunk')
+  },
 })

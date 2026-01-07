@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "~/components/UI/button";
 import DropZone from "~/components/UI/DropZone";
-import SubtitleListEditor from "~/components/Agent/SubtitleListEditor";
+import SubtitleListEditor from "~/components/Archive/SubtitleListEditor";
 import { parseSRT } from "~/lib/youtube.service";
 import type { SubtitleItem } from "~/lib/youtube.service";
 import {

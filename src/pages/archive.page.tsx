@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '~/components/Layout/main.layout';
 import ArchiveMain from '~/components/Archive/ArchiveMain';
-import CaptionEditor from '~/components/Agent/CaptionEditor';
+import CaptionEditor from '~/components/Archive/CaptionEditor';
 import {
   addDocument,
   removeDocument,

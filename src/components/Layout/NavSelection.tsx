@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 const pathNavigate = [
     { name: "Dictation", path: "/" },
     { name: "Archive", path: "/archive" },
+    { name: "Agent", path: "/agent" },
     { name: "Carbin", path: "/carbin" },
 ];
 

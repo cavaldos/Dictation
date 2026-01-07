@@ -4,6 +4,7 @@ const MainLayout = lazy(() => import('~/components/Layout/main.layout'));
 const DictationPage = lazy(() => import('~/pages/dictation.page'));
 const SettingPage = lazy(() => import('~/pages/setting.page'));
 const ArchivePage = lazy(() => import('~/pages/archive.page'));
+const AgentPage = lazy(() => import('~/pages/agent.page'));
 const Router = [
     {
         name: '',
@@ -32,6 +33,13 @@ const Router = [
         path: '/carbin',
         component: () => <h1>Carbin Page</h1>,
         Layout: MainLayout,
+    },
+    {
+        name: 'Agent',
+        icon: '',
+        path: '/agent',
+        component: AgentPage,
+        Layout: null,
     },
 
 ];

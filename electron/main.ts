@@ -3,14 +3,27 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { getSubtitles } from 'youtube-captions-scraper'
 import Store from 'electron-store'
+import dotenv from 'dotenv'
+import * as gemini from './ai/gemini.js'
+import * as groq from './ai/groq.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// Load .env from project root
+dotenv.config({ path: path.join(__dirname, '../.env') })
 
 // Initialize electron-store for persistent storage
 const store = new Store({
   name: 'redux-persist',
   defaults: {}
 })
+
+// AI provider state
+let currentProvider = 'gemini' // 'gemini' or 'groq'
+const aiProviders = [
+  { id: 'gemini', name: 'Gemini', currentModel: gemini.getModel() },
+  { id: 'groq', name: 'Groq', currentModel: groq.getGroqModel() },
+]
 
 process.env.DIST_ELECTRON = path.join(__dirname, '..')
 process.env.DIST = path.join(__dirname, '../dist-electron')
@@ -107,6 +120,96 @@ ipcMain.handle('electron-store-remove', async (_event, key: string) => {
     return false
   }
 })
+
+// AI Chat IPC handlers
+ipcMain.handle('get-ai-providers', async () => {
+  try {
+    return {
+      success: true,
+      data: {
+        providers: aiProviders,
+        currentProvider: currentProvider
+      }
+    }
+  } catch (error) {
+    console.error('get-ai-providers error:', error)
+    return { success: false, error: 'Failed to get AI providers' }
+  }
+})
+
+ipcMain.handle('set-ai-provider', async (_event, providerId: string) => {
+  try {
+    if (!aiProviders.find(p => p.id === providerId)) {
+      return { success: false, error: 'Invalid provider ID' }
+    }
+    currentProvider = providerId
+    return { success: true }
+  } catch (error) {
+    console.error('set-ai-provider error:', error)
+    return { success: false, error: 'Failed to set AI provider' }
+  }
+})
+
+ipcMain.handle('fetch-ai-models', async (_event, providerId: string) => {
+  try {
+    let models: Array<{id: string, name: string, description: string}> = []
+    if (providerId === 'gemini') {
+      models = await gemini.listGeminiModels()
+    } else if (providerId === 'groq') {
+      models = await groq.listGroqModels()
+    } else {
+      return { success: false, error: 'Invalid provider ID' }
+    }
+    return { success: true, data: models }
+  } catch (error) {
+    console.error('fetch-ai-models error:', error)
+    return { success: false, error: 'Failed to fetch models' }
+  }
+})
+
+ipcMain.handle('set-ai-model', async (_event, providerId: string, modelId: string) => {
+  try {
+    if (providerId === 'gemini') {
+      gemini.setModel(modelId)
+      const provider = aiProviders.find(p => p.id === 'gemini')
+      if (provider) provider.currentModel = modelId
+    } else if (providerId === 'groq') {
+      groq.setGroqModel(modelId)
+      const provider = aiProviders.find(p => p.id === 'groq')
+      if (provider) provider.currentModel = modelId
+    } else {
+      return { success: false, error: 'Invalid provider ID' }
+    }
+    return { success: true }
+  } catch (error) {
+    console.error('set-ai-model error:', error)
+    return { success: false, error: 'Failed to set model' }
+  }
+})
+
+ipcMain.handle('chat-with-ai-stream', async (event, history: Array<{role: string, content: string}>, message: string) => {
+  try {
+    let fullResponse = ''
+    
+    const onChunk = (chunk: string) => {
+      event.sender.send('ai-chat-chunk', chunk)
+    }
+    
+    if (currentProvider === 'gemini') {
+      fullResponse = await gemini.chatWithGeminiStream(history, message, onChunk)
+    } else if (currentProvider === 'groq') {
+      fullResponse = await groq.chatWithGroqStream(history, message, onChunk)
+    } else {
+      return { success: false, error: 'Invalid provider' }
+    }
+    
+    return { success: true, data: fullResponse }
+  } catch (error) {
+    console.error('chat-with-ai-stream error:', error)
+    return { success: false, error: (error as Error).message }
+  }
+})
+
 
 function createWindow() {
   win = new BrowserWindow({

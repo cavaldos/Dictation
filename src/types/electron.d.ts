@@ -22,6 +22,39 @@ interface FetchSubtitlesResult {
   error?: string
 }
 
+interface AIModel {
+  id: string
+  name: string
+  description: string
+}
+
+interface AIProvider {
+  id: string
+  name: string
+  currentModel: string
+}
+
+interface AIProvidersResult {
+  success: boolean
+  data?: {
+    providers: AIProvider[]
+    currentProvider: string
+  }
+  error?: string
+}
+
+interface AIModelsResult {
+  success: boolean
+  data?: AIModel[]
+  error?: string
+}
+
+interface AIResult {
+  success: boolean
+  data?: string
+  error?: string
+}
+
 interface Window {
   electronAPI: {
     platform: string
@@ -31,5 +64,13 @@ interface Window {
     storeGet: (key: string) => Promise<string | null>
     storeSet: (key: string, value: string) => Promise<boolean>
     storeRemove: (key: string) => Promise<boolean>
+    // AI Chat methods
+    getAIProviders: () => Promise<AIProvidersResult>
+    setAIProvider: (providerId: string) => Promise<AIResult>
+    fetchAIModels: (providerId: string) => Promise<AIModelsResult>
+    setAIModel: (providerId: string, modelId: string) => Promise<AIResult>
+    chatWithAIStream: (history: Array<{role: string, content: string}>, message: string) => Promise<AIResult>
+    onAIChatChunk: (callback: (chunk: string) => void) => void
+    removeAIChatChunkListener: () => void
   }
 }
