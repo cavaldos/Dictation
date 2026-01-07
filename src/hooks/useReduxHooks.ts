@@ -23,7 +23,7 @@ import {
   selectDocumentName,
   findSubtitleByTime,
 } from '~/redux/features/dictationSlice';
-import type { SubtitleItem } from '~/utils/youtube.service';
+import type { SubtitleItem } from '~/lib/youtube.service';
 
 // Settings Hook
 export const useSettings = () => {

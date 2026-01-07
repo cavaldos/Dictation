@@ -4,8 +4,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const pathNavigate = [
     { name: "Dictation", path: "/" },
-    { name: "Carbin", path: "/carbin" },
     { name: "Archive", path: "/archive" },
+    { name: "Carbin", path: "/carbin" },
 ];
 
 // Check if running in Electron

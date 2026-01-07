@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Check, SkipForward, ChevronRight, Eye, EyeOff } from 'lucide-react';
-import type { SubtitleItem } from '~/utils/youtube.service';
-import { compareTexts, compareWordsDetailed, type WordComparison } from '~/utils/youtube.service';
+import type { SubtitleItem } from '~/lib/youtube.service';
+import { compareTexts, compareWordsDetailed, type WordComparison } from '~/lib/youtube.service';
 import { useSettings } from '~/hooks/useReduxHooks';
 
 interface DictationInputProps {

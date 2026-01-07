@@ -5,7 +5,7 @@ import type { YouTubePlayer } from "react-youtube";
 import VideoPlayer, { type VideoPlayerRef } from "~/components/Dictation/VideoPlayer";
 import DictationInput from "~/components/Dictation/DictationInput";
 import DropZone from "~/components/UI/DropZone";
-import { extractVideoId, parseSRTRaw, mergeSubtitlesWithTranslation } from "~/utils/youtube.service";
+import { extractVideoId, parseSRTRaw, mergeSubtitlesWithTranslation } from "~/lib/youtube.service";
 import { useDictation, useSettings } from "~/hooks/useReduxHooks";
 import { useKeyboardShortcuts } from "~/hooks/useKeyboardShortcuts";
 

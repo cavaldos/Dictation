@@ -1,11 +1,10 @@
 import React from "react";
-import { Play, Trash2, Pencil, FileText, Video, Calendar, Languages } from "lucide-react";
+import { Play, Trash2, FileText, Video, Calendar, Languages } from "lucide-react";
 import { Button } from "~/components/UI/button";
 import type { DictationDocument } from "~/redux/features/dictationArchiveSlice";
 
 interface ArchiveItemProps {
   document: DictationDocument;
-  isSelected: boolean;
   isEditing: boolean;
   onSelect: () => void;
   onEdit: () => void;
@@ -14,7 +13,6 @@ interface ArchiveItemProps {
 
 const ArchiveItem: React.FC<ArchiveItemProps> = ({
   document,
-  isSelected,
   isEditing,
   onSelect,
   onEdit,
@@ -34,55 +32,61 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({
 
   return (
     <div
+      onClick={onEdit}
       className={`
-        bg-notion-bg-secondary border rounded-lg p-4 transition-all
+        rounded-xl p-4 transition-all duration-200 cursor-pointer
         ${
-          isSelected
-            ? "border-primary ring-2 ring-primary/20"
-            : isEditing
-            ? "border-blue-500 ring-2 ring-blue-500/20"
-            : "border-notion-border hover:border-notion-border-hover"
+          isEditing
+            ? "bg-blue-500/10"
+            : "bg-white/[0.03] hover:bg-white/[0.06]"
         }
       `}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-notion-text truncate">
+          <h3 className="font-medium text-gray-100 truncate">
             {document.name}
           </h3>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-notion-text-muted">
-            <span className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-gray-500">
+            <span className="flex items-center gap-1.5">
               <Video className="w-3.5 h-3.5" />
               {document.videoId}
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5">
               <Languages className="w-3.5 h-3.5" />
               {document.captions?.map((c) => c.languageLabel).join(", ") || "N/A"}
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5" />
               {getTotalSegments()} segments
             </span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
               {formatDate(document.createdAt)}
             </span>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="default" size="sm" onClick={onSelect}>
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect();
+            }} 
+            className="bg-primary hover:bg-primary/90"
+          >
             <Play className="w-3.5 h-3.5" />
             Load
-          </Button>
-          <Button variant="outline" size="sm" onClick={onEdit}>
-            <Pencil className="w-3.5 h-3.5" />
-            Edit
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={onDelete}
-            className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8"
           >
             <Trash2 className="w-4 h-4" />
           </Button>

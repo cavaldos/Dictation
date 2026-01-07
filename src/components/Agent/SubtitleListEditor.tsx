@@ -12,7 +12,7 @@ import {
   LayoutList,
 } from "lucide-react";
 import { Button } from "~/components/UI/button";
-import type { SubtitleItem } from "~/utils/youtube.service";
+import type { SubtitleItem } from "~/lib/youtube.service";
 import type { CaptionTrack, CaptionLanguage } from "~/redux/features/dictationArchiveSlice";
 
 type ViewMode = "single" | "dual";
@@ -202,8 +202,8 @@ const SubtitleListEditor: React.FC<SubtitleListEditorProps> = ({
           <div
             key={index}
             className={`group transition-colors ${editingIndex === index && editingLanguage === language
-                ? "bg-primary/5"
-                : "hover:bg-notion-hover"
+              ? "bg-primary/5"
+              : "hover:bg-notion-hover"
               }`}
           >
             {editingIndex !== index || editingLanguage !== language ? (
@@ -516,8 +516,8 @@ const SubtitleListEditor: React.FC<SubtitleListEditorProps> = ({
           <button
             onClick={() => setViewMode("single")}
             className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors ${viewMode === "single"
-                ? "bg-primary text-white"
-                : "text-notion-text-muted hover:text-notion-text"
+              ? "bg-primary text-white"
+              : "text-notion-text-muted hover:text-notion-text"
               }`}
           >
             <LayoutList className="w-3.5 h-3.5" />
@@ -527,8 +527,8 @@ const SubtitleListEditor: React.FC<SubtitleListEditorProps> = ({
             onClick={() => setViewMode("dual")}
             disabled={tracks.length < 2}
             className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors ${viewMode === "dual"
-                ? "bg-primary text-white"
-                : "text-notion-text-muted hover:text-notion-text disabled:opacity-50"
+              ? "bg-primary text-white"
+              : "text-notion-text-muted hover:text-notion-text disabled:opacity-50"
               }`}
           >
             <Columns className="w-3.5 h-3.5" />

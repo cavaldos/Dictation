@@ -105,32 +105,32 @@ const DropZone: React.FC<DropZoneProps> = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          relative border-2 border-dashed rounded-lg p-6 transition-all cursor-pointer
+          relative rounded-lg p-3 transition-all cursor-pointer border-2 border-dashed
           ${isDragging 
             ? 'border-primary bg-primary/10' 
             : fileName 
-              ? 'border-green-500/50 bg-green-500/5' 
-              : 'border-notion-border hover:border-primary/50 hover:bg-notion-hover/50'
+              ? 'border-green-500/50 bg-green-500/10' 
+              : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'
           }
-          ${error ? 'border-red-500/50 bg-red-500/5' : ''}
+          ${error ? 'border-red-500/50 bg-red-500/10' : ''}
         `}
       >
-        <div className="flex flex-col items-center gap-3 text-center">
+        <div className="flex items-center gap-3">
           {fileName ? (
             <>
-              <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                <Check className="w-6 h-6 text-green-500" />
+              <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                <Check className="w-4 h-4 text-green-500" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-notion-text">{label}</p>
-                <p className="text-xs text-green-500 flex items-center gap-1 justify-center mt-1">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-notion-text truncate">{label}</p>
+                <p className="text-xs text-green-500 flex items-center gap-1 mt-0.5">
                   <FileText className="w-3 h-3" />
-                  {fileName}
+                  <span className="truncate">{fileName}</span>
                 </p>
               </div>
               <button
                 onClick={handleClear}
-                className="absolute top-2 right-2 p-1 rounded-full hover:bg-notion-hover transition-colors"
+                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
                 title="Remove file"
               >
                 <X className="w-4 h-4 text-notion-text-muted" />
@@ -138,14 +138,14 @@ const DropZone: React.FC<DropZoneProps> = ({
             </>
           ) : (
             <>
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                isDragging ? 'bg-primary/20' : 'bg-notion-hover'
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                isDragging ? 'bg-primary/20' : 'bg-white/[0.06]'
               }`}>
-                <Upload className={`w-6 h-6 ${isDragging ? 'text-primary' : 'text-notion-text-muted'}`} />
+                <Upload className={`w-4 h-4 ${isDragging ? 'text-primary' : 'text-notion-text-muted'}`} />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-notion-text">{label}</p>
-                <p className="text-xs text-notion-text-muted mt-1">
+                <p className="text-xs text-notion-text-muted mt-0.5">
                   Drag & drop or click to browse
                 </p>
               </div>
@@ -154,7 +154,7 @@ const DropZone: React.FC<DropZoneProps> = ({
         </div>
 
         {error && (
-          <p className="text-xs text-red-400 mt-2 text-center">{error}</p>
+          <p className="text-xs text-red-400 mt-2">{error}</p>
         )}
       </div>
     </div>

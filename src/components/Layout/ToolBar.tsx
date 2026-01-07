@@ -24,7 +24,7 @@ const ToolBar: React.FC<ToolBarProps> = ({
     const dispatch = useDispatch();
 
     return (
-        <header className={`h-9 w-full flex items-center justify-between bg-[rgb(25,25,25)] px-2 select-none custom-drag-region transition-all duration-200`}>
+        <header className={`h-9 w-full flex items-center justify-between bg-[rgb(25,25,25)] px-2 mt-1 select-none custom-drag-region transition-all duration-200`}>
             {/* Left section */}
             <NavSelection />
 
@@ -35,6 +35,15 @@ const ToolBar: React.FC<ToolBarProps> = ({
 
             {/* Right section - Layout toggles */}
             <div className="flex items-center gap-2 w-[200px] justify-end">
+
+                {/* Settings button */}
+                <button
+                    onClick={() => dispatch(openSettingsModal())}
+                    title="Settings"
+                    className="p-1.5 rounded transition-colors titlebar-no-drag text-[rgb(142,142,142)] hover:bg-[rgb(49,49,49)] hover:text-[rgb(200,200,200)]"
+                >
+                    <Settings size={16} />
+                </button>
                 <div className="flex items-center gap-0.5">
                     {hasLeftSide && (
                         <button
@@ -60,14 +69,6 @@ const ToolBar: React.FC<ToolBarProps> = ({
                             <PanelRight size={16} />
                         </button>
                     )}
-                    {/* Settings button */}
-                    <button
-                        onClick={() => dispatch(openSettingsModal())}
-                        title="Settings"
-                        className="p-1.5 rounded transition-colors titlebar-no-drag text-[rgb(142,142,142)] hover:bg-[rgb(49,49,49)] hover:text-[rgb(200,200,200)]"
-                    >
-                        <Settings size={16} />
-                    </button>
                 </div>
             </div>
         </header>

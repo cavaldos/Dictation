@@ -5,7 +5,6 @@ import type { DictationDocument } from "~/redux/features/dictationArchiveSlice";
 
 interface ArchiveListProps {
   documents: DictationDocument[];
-  selectedDocumentId: string | null;
   editingDocumentId: string | null;
   onSelect: (doc: DictationDocument) => void;
   onEdit: (doc: DictationDocument) => void;
@@ -15,7 +14,6 @@ interface ArchiveListProps {
 
 const ArchiveList: React.FC<ArchiveListProps> = ({
   documents,
-  selectedDocumentId,
   editingDocumentId,
   onSelect,
   onEdit,
@@ -24,10 +22,12 @@ const ArchiveList: React.FC<ArchiveListProps> = ({
 }) => {
   if (isEmpty) {
     return (
-      <div className="text-center py-12 text-notion-text-muted">
-        <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p>No documents saved yet.</p>
-        <p className="text-sm mt-1">
+      <div className="text-center py-16 text-notion-text-muted">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+          <FileText className="w-8 h-8 opacity-50" />
+        </div>
+        <p className="text-gray-300 font-medium">No documents saved yet.</p>
+        <p className="text-sm mt-1 text-gray-500">
           Click "Add New" to create your first dictation document.
         </p>
       </div>
@@ -40,7 +40,6 @@ const ArchiveList: React.FC<ArchiveListProps> = ({
         <ArchiveItem
           key={doc.id}
           document={doc}
-          isSelected={selectedDocumentId === doc.id}
           isEditing={editingDocumentId === doc.id}
           onSelect={() => onSelect(doc)}
           onEdit={() => onEdit(doc)}

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Button } from "~/components/UI/button";
 import DropZone from "~/components/UI/DropZone";
-import { extractVideoId, parseSRT } from "~/utils/youtube.service";
-import type { SubtitleItem } from "~/utils/youtube.service";
+import { extractVideoId, parseSRT } from "~/lib/youtube.service";
+import type { SubtitleItem } from "~/lib/youtube.service";
 import type { DictationDocument, CaptionLanguage, CaptionTrack } from "~/redux/features/dictationArchiveSlice";
 
 // Language options
@@ -172,14 +172,11 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
     };
 
     return (
-        <div className="bg-notion-bg-secondary border border-notion-border rounded-lg p-6 mb-6">
-            <h2 className="text-lg font-semibold text-notion-text mb-4">
-                Add New Document
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Name */}
                 <div>
-                    <label className="block text-sm font-medium text-notion-text mb-1">
+                    <label className="block text-sm font-medium text-notion-text mb-2">
                         Document Name
                     </label>
                     <input
@@ -187,13 +184,13 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g., English Listening Practice #1"
-                        className="w-full px-3 py-2 bg-notion-bg border border-notion-border rounded-md text-notion-text placeholder:text-notion-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        className="w-full px-3 py-2 bg-white/[0.03] rounded-lg text-notion-text placeholder:text-notion-text-muted focus:outline-none focus:bg-white/[0.06] transition-colors"
                     />
                 </div>
 
                 {/* Video URL */}
                 <div>
-                    <label className="block text-sm font-medium text-notion-text mb-1">
+                    <label className="block text-sm font-medium text-notion-text mb-2">
                         YouTube Video URL
                     </label>
                     <input
@@ -201,13 +198,13 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                         value={videoUrl}
                         onChange={(e) => setVideoUrl(e.target.value)}
                         placeholder="https://www.youtube.com/watch?v=..."
-                        className="w-full px-3 py-2 bg-notion-bg border border-notion-border rounded-md text-notion-text placeholder:text-notion-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        className="w-full px-3 py-2 bg-white/[0.03] rounded-lg text-notion-text placeholder:text-notion-text-muted focus:outline-none focus:bg-white/[0.06] transition-colors"
                     />
                 </div>
 
                 {/* Caption Tracks */}
                 <div>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-3">
                         <label className="block text-sm font-medium text-notion-text">
                             Caption Tracks
                         </label>
@@ -216,6 +213,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                             variant="ghost"
                             size="sm"
                             onClick={addCaptionInput}
+                            className="text-xs"
                         >
                             <Plus className="w-3.5 h-3.5" />
                             Add Language
@@ -226,7 +224,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                         {captionInputs.map((input, index) => (
                             <div
                                 key={input.id}
-                                className="border border-notion-border rounded-lg p-4 bg-notion-bg"
+                                className="rounded-xl p-4 bg-white/[0.03]"
                             >
                                 <div className="flex items-center gap-3 mb-3">
                                     <select
@@ -236,7 +234,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                                                 language: e.target.value as CaptionLanguage,
                                             })
                                         }
-                                        className="flex-1 px-3 py-2 bg-notion-bg-secondary border border-notion-border rounded-md text-notion-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                        className="flex-1 px-3 py-2 bg-white/[0.05] rounded-lg text-notion-text focus:outline-none focus:bg-white/[0.08] transition-colors"
                                     >
                                         {LANGUAGE_OPTIONS.map((opt) => (
                                             <option key={opt.value} value={opt.value}>
@@ -245,7 +243,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                                         ))}
                                     </select>
 
-                                    <label className="flex items-center gap-2 text-sm text-notion-text-muted">
+                                    <label className="flex items-center gap-2 text-sm text-notion-text-muted cursor-pointer">
                                         <input
                                             type="radio"
                                             name="primaryLanguage"
@@ -253,7 +251,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                                             onChange={() =>
                                                 setPrimaryLanguage(input.language)
                                             }
-                                            className="text-primary"
+                                            className="accent-primary"
                                         />
                                         Primary
                                     </label>
@@ -264,7 +262,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => removeCaptionInput(input.id)}
-                                            className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8"
                                         >
                                             <X className="w-4 h-4" />
                                         </Button>
@@ -292,7 +290,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                                 />
 
                                 {index === 0 && (
-                                    <p className="text-xs text-notion-text-muted mt-2">
+                                    <p className="text-xs text-notion-text-muted mt-3">
                                         Or paste subtitle content below:
                                     </p>
                                 )}
@@ -306,7 +304,7 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
                                     }
                                     placeholder={`1\n00:00:01,000 --> 00:00:04,000\nHello, this is an example subtitle.\n\n2\n00:00:05,000 --> 00:00:08,000\nThis is the second line.`}
                                     rows={4}
-                                    className="w-full mt-2 px-3 py-2 bg-notion-bg-secondary border border-notion-border rounded-md text-notion-text placeholder:text-notion-text-muted focus:outline-none focus:ring-2 focus:ring-primary/50 font-mono text-sm"
+                                    className="w-full mt-2 px-3 py-2 bg-white/[0.05] rounded-lg text-notion-text placeholder:text-notion-text-muted focus:outline-none focus:bg-white/[0.08] transition-colors font-mono text-sm resize-none"
                                 />
                             </div>
                         ))}
@@ -315,17 +313,17 @@ const ArchiveForm: React.FC<ArchiveFormProps> = ({ onSubmit, onCancel }) => {
 
                 {/* Error */}
                 {error && (
-                    <div className="text-sm text-red-500 bg-red-500/10 px-3 py-2 rounded-md">
+                    <div className="text-sm text-red-400 bg-red-500/10 px-4 py-3 rounded-lg">
                         {error}
                     </div>
                 )}
 
                 {/* Actions */}
                 <div className="flex gap-3 pt-2">
-                    <Button type="submit" variant="default">
+                    <Button type="submit" variant="default" className="bg-primary hover:bg-primary/90">
                         Save Document
                     </Button>
-                    <Button type="button" variant="outline" onClick={resetForm}>
+                    <Button type="button" variant="ghost" onClick={resetForm} className="hover:bg-white/[0.05]">
                         Cancel
                     </Button>
                 </div>

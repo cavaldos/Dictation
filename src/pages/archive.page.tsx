@@ -17,7 +17,7 @@ import type { RootState } from '~/redux/store';
 const ArchivePage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { documents, selectedDocumentId, editingDocumentId } = useSelector(
+  const { documents, editingDocumentId } = useSelector(
     (state: RootState) => state.dictationArchive
   );
 
@@ -67,7 +67,6 @@ const ArchivePage: React.FC = () => {
       maincontent={
         <ArchiveMain
           documents={documents}
-          selectedDocumentId={selectedDocumentId}
           editingDocumentId={editingDocumentId}
           onSelect={handleSelect}
           onEdit={handleEdit}
@@ -77,8 +76,23 @@ const ArchivePage: React.FC = () => {
       }
       rightSide={
         editingDocument ? (
-          <CaptionEditor document={editingDocument} onClose={handleCloseEditor} />
-        ) : null
+          <CaptionEditor 
+            key={editingDocument.id} 
+            document={editingDocument} 
+            onClose={handleCloseEditor} 
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-500 text-sm p-6 text-center">
+            <div>
+              <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-white/[0.03] flex items-center justify-center">
+                <svg className="w-6 h-6 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <p className="text-gray-400">Select a document to edit</p>
+            </div>
+          </div>
+        )
       }
       leftSide={null}
     />

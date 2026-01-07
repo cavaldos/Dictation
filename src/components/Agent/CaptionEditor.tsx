@@ -13,8 +13,8 @@ import {
 import { Button } from "~/components/UI/button";
 import DropZone from "~/components/UI/DropZone";
 import SubtitleListEditor from "~/components/Agent/SubtitleListEditor";
-import { parseSRT } from "~/utils/youtube.service";
-import type { SubtitleItem } from "~/utils/youtube.service";
+import { parseSRT } from "~/lib/youtube.service";
+import type { SubtitleItem } from "~/lib/youtube.service";
 import {
   updateDocument,
   addCaptionTrack,
@@ -283,7 +283,7 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
   // Render subtitle list editor view
   if (currentView === "subtitle-list") {
     return (
-      <div className="w-[480px] border-l border-notion-border bg-notion-bg-secondary h-full">
+      <div className="h-full flex flex-col">
         <SubtitleListEditor
           tracks={document.captions}
           primaryLanguage={document.primaryLanguage}
@@ -296,34 +296,39 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
 
   // Main editor view
   return (
-    <div className="w-[480px] border-l border-notion-border bg-notion-bg-secondary h-full flex flex-col">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-notion-border">
-        <h2 className="text-lg font-semibold text-notion-text">Edit Document</h2>
-        <Button variant="ghost" size="icon" onClick={onClose}>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+        <h2 className="text-base font-semibold text-gray-100">Edit Document</h2>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onClose}
+          className="h-8 w-8 hover:bg-white/[0.06]"
+        >
           <X className="w-4 h-4" />
         </Button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-4 space-y-6">
+      <div className="flex-1 overflow-auto p-4 space-y-5">
         {/* Success Message */}
         {successMessage && (
-          <div className="text-sm text-green-500 bg-green-500/10 px-3 py-2 rounded-md">
+          <div className="text-sm text-green-400 bg-green-500/10 px-3 py-2 rounded-lg">
             {successMessage}
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="text-sm text-red-500 bg-red-500/10 px-3 py-2 rounded-md">
+          <div className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">
             {error}
           </div>
         )}
 
         {/* Document Name */}
         <div>
-          <label className="block text-sm font-medium text-notion-text mb-1">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Document Name
           </label>
           <div className="flex gap-2">
@@ -331,13 +336,14 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="flex-1 px-3 py-2 bg-notion-bg border border-notion-border rounded-md text-notion-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="flex-1 px-3 py-2 bg-white/[0.03] rounded-lg text-gray-200 focus:outline-none focus:bg-white/[0.06] transition-colors"
             />
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleSaveName}
               disabled={!name.trim() || name === document.name}
+              className="hover:bg-white/[0.06]"
             >
               <Save className="w-3.5 h-3.5" />
             </Button>
@@ -346,7 +352,7 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
 
         {/* Primary Language */}
         <div>
-          <label className="block text-sm font-medium text-notion-text mb-1">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Primary Language (for dictation)
           </label>
           <div className="flex gap-2">
@@ -355,7 +361,7 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
               onChange={(e) =>
                 setPrimaryLanguage(e.target.value as CaptionLanguage)
               }
-              className="flex-1 px-3 py-2 bg-notion-bg border border-notion-border rounded-md text-notion-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="flex-1 px-3 py-2 bg-white/[0.03] rounded-lg text-gray-200 focus:outline-none focus:bg-white/[0.06] transition-colors"
             >
               {document.captions.map((track) => (
                 <option key={track.language} value={track.language}>
@@ -364,10 +370,11 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
               ))}
             </select>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={handleSavePrimaryLanguage}
               disabled={primaryLanguage === document.primaryLanguage}
+              className="hover:bg-white/[0.06]"
             >
               <Save className="w-3.5 h-3.5" />
             </Button>
@@ -376,8 +383,8 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
 
         {/* Caption Tracks */}
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-notion-text flex items-center gap-2">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
               <Languages className="w-4 h-4" />
               Caption Tracks ({document.captions.length})
             </label>
@@ -387,55 +394,59 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
             {document.captions.map((track) => (
               <div
                 key={track.language}
-                className="border border-notion-border rounded-lg bg-notion-bg overflow-hidden"
+                className={`rounded-xl overflow-hidden transition-all ${
+                  expandedTrack === track.language 
+                    ? 'bg-white/[0.04]' 
+                    : 'bg-white/[0.02] hover:bg-white/[0.04]'
+                }`}
               >
                 {/* Track Header */}
                 <div
-                  className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-notion-hover"
+                  className="flex items-center justify-between px-3 py-2.5 cursor-pointer"
                   onClick={() => toggleExpand(track.language)}
                 >
                   <div className="flex items-center gap-2">
                     {expandedTrack === track.language ? (
-                      <ChevronUp className="w-4 h-4 text-notion-text-muted" />
+                      <ChevronUp className="w-4 h-4 text-gray-500" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-notion-text-muted" />
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
                     )}
-                    <span className="font-medium text-notion-text">
+                    <span className="font-medium text-gray-200">
                       {track.languageLabel}
                     </span>
                     {track.language === document.primaryLanguage && (
-                      <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
+                      <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
                         Primary
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-notion-text-muted">
+                  <span className="text-xs text-gray-500 bg-white/[0.05] px-2 py-0.5 rounded-full">
                     {track.subtitles.length} segments
                   </span>
                 </div>
 
                 {/* Track Content */}
                 {expandedTrack === track.language && (
-                  <div className="px-3 pb-3 border-t border-notion-border pt-3 space-y-3">
+                  <div className="px-3 pb-3 pt-1 space-y-3">
                     {/* Edit Subtitles Button */}
                     <Button
-                      variant="outline"
-                      className="w-full justify-start"
+                      variant="ghost"
+                      className="w-full justify-start bg-white/[0.03] hover:bg-white/[0.06]"
                       onClick={() => handleOpenSubtitleEditor()}
                     >
                       <List className="w-4 h-4 mr-2" />
                       Edit Subtitles List
-                      <span className="ml-auto text-xs text-notion-text-muted">
+                      <span className="ml-auto text-xs text-gray-500">
                         {track.subtitles.length} items
                       </span>
                     </Button>
 
-                    <div className="relative">
+                    <div className="relative py-2">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-notion-border"></div>
+                        <div className="w-full border-t border-white/[0.06]"></div>
                       </div>
                       <div className="relative flex justify-center text-xs">
-                        <span className="px-2 bg-notion-bg text-notion-text-muted">
+                        <span className="px-2 bg-[rgb(30,30,30)] text-gray-500">
                           or upload/paste SRT
                         </span>
                       </div>
@@ -459,8 +470,8 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
                           [track.language]: e.target.value,
                         })
                       }
-                      rows={6}
-                      className="w-full px-3 py-2 bg-notion-bg-secondary border border-notion-border rounded-md text-notion-text font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      rows={5}
+                      className="w-full px-3 py-2 bg-black/20 rounded-lg text-gray-300 font-mono text-sm focus:outline-none focus:bg-black/30 transition-colors resize-none"
                       placeholder="SRT content..."
                     />
                     <div className="flex justify-between mt-2">
@@ -468,7 +479,7 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemoveTrack(track.language)}
-                        className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                         disabled={document.captions.length <= 1}
                       >
                         <Trash2 className="w-3.5 h-3.5 mr-1" />
@@ -478,6 +489,7 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
                         variant="default"
                         size="sm"
                         onClick={() => handleSaveTrack(track.language)}
+                        className="bg-primary hover:bg-primary/90"
                       >
                         <Save className="w-3.5 h-3.5 mr-1" />
                         Save SRT
@@ -492,8 +504,8 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
 
         {/* Add New Track */}
         {availableLanguages.length > 0 && (
-          <div className="border border-dashed border-notion-border rounded-lg p-4">
-            <h3 className="text-sm font-medium text-notion-text mb-3 flex items-center gap-2">
+          <div className="border-2 border-dashed border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors">
+            <h3 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
               <Plus className="w-4 h-4" />
               Add New Caption Track
             </h3>
@@ -505,7 +517,7 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
                   e.target.value ? (e.target.value as CaptionLanguage) : null
                 )
               }
-              className="w-full px-3 py-2 bg-notion-bg border border-notion-border rounded-md text-notion-text focus:outline-none focus:ring-2 focus:ring-primary/50 mb-3"
+              className="w-full px-3 py-2 bg-white/[0.03] rounded-lg text-gray-200 focus:outline-none focus:bg-white/[0.06] transition-colors mb-3"
             >
               <option value="">Select language...</option>
               {availableLanguages.map((opt) => (
@@ -525,13 +537,13 @@ const CaptionEditor: React.FC<CaptionEditorProps> = ({ document, onClose }) => {
                 <textarea
                   value={newTrackContent}
                   onChange={(e) => setNewTrackContent(e.target.value)}
-                  rows={6}
-                  className="w-full px-3 py-2 bg-notion-bg border border-notion-border rounded-md text-notion-text font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  rows={5}
+                  className="w-full px-3 py-2 bg-black/20 rounded-lg text-gray-300 font-mono text-sm focus:outline-none focus:bg-black/30 transition-colors resize-none"
                   placeholder="Paste SRT content here..."
                 />
                 <Button
                   variant="default"
-                  className="w-full mt-3"
+                  className="w-full mt-3 bg-primary hover:bg-primary/90"
                   onClick={handleAddTrack}
                   disabled={!newTrackContent.trim()}
                 >

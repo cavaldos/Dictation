@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { SubtitleItem } from '~/utils/youtube.service';
+import type { SubtitleItem } from '~/lib/youtube.service';
 
 interface DictationState {
   subtitles: SubtitleItem[];

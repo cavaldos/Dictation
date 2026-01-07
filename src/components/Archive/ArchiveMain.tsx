@@ -1,6 +1,7 @@
 import React from "react";
 import { Plus } from "lucide-react";
 import { Button } from "~/components/UI/button";
+import Modal from "~/components/UI/Modal";
 import ArchiveForm from "./ArchiveForm";
 import ArchiveList from "./ArchiveList";
 import ArchiveStats from "./ArchiveStats";
@@ -8,7 +9,6 @@ import type { DictationDocument } from "~/redux/features/dictationArchiveSlice";
 
 interface ArchiveMainProps {
   documents: DictationDocument[];
-  selectedDocumentId: string | null;
   editingDocumentId: string | null;
   onSelect: (doc: DictationDocument) => void;
   onEdit: (doc: DictationDocument) => void;
@@ -18,7 +18,6 @@ interface ArchiveMainProps {
 
 const ArchiveMain: React.FC<ArchiveMainProps> = ({
   documents,
-  selectedDocumentId,
   editingDocumentId,
   onSelect,
   onEdit,
@@ -35,9 +34,6 @@ const ArchiveMain: React.FC<ArchiveMainProps> = ({
           <h1 className="text-2xl font-bold text-notion-text">
             Dictation Archive
           </h1>
-          <p className="text-sm text-notion-text-muted mt-1">
-            Save and manage your dictation documents
-          </p>
         </div>
         <Button
           onClick={() => setIsFormOpen(!isFormOpen)}
@@ -48,18 +44,25 @@ const ArchiveMain: React.FC<ArchiveMainProps> = ({
         </Button>
       </div>
 
-      {/* Add New Form */}
-      {isFormOpen && (
+      {/* Add New Form Modal */}
+      <Modal
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        title="Add New Document"
+        maxWidth="max-w-2xl"
+      >
         <ArchiveForm
-          onSubmit={onAddDocument}
+          onSubmit={(doc) => {
+            onAddDocument(doc);
+            setIsFormOpen(false);
+          }}
           onCancel={() => setIsFormOpen(false)}
         />
-      )}
+      </Modal>
 
       {/* Document List */}
       <ArchiveList
         documents={documents}
-        selectedDocumentId={selectedDocumentId}
         editingDocumentId={editingDocumentId}
         onSelect={onSelect}
         onEdit={onEdit}
