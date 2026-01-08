@@ -1,76 +1,69 @@
-# React + TypeScript + Vite
+# Dictation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ứng dụng luyện nghe tiếng Anh với video YouTube, tích hợp AI hỗ trợ học tập.
 
-Currently, two official plugins are available:
+## Screenshot
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![Dictation App](screenshot/image.png)
 
-## React Compiler
+## Tính năng
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- Luyện nghe chép chính tả với video YouTube
+- Chỉnh sửa và quản lý phụ đề
+- Lưu trữ bài luyện tập
+- Chatbot AI hỗ trợ (Gemini, Groq)
 
-Note: This will impact Vite dev & build performances.
+## Công nghệ
 
-## Expanding the ESLint configuration
+- **Frontend:** React 19, TypeScript, Tailwind CSS
+- **Desktop:** Electron
+- **State:** Redux Toolkit, Redux Persist
+- **AI:** Google Gemini, Groq
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Cài đặt
 
-```JavaScript
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Clone repo
+git clone <repo-url>
+cd dictation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Cài đặt dependencies
+npm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Chạy development
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Scripts
 
-```JavaScript
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Lệnh | Mô tả |
+|------|-------|
+| `npm run dev` | Chạy development server |
+| `npm run build` | Build web app (cho Vercel) |
+| `npm run build:electron` | Build ứng dụng desktop |
+| `npm run lint` | Kiểm tra lỗi ESLint |
+| `npm run preview` | Preview bản build |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Build
+
+### Web (Vercel, Netlify, ...)
+
+```bash
+npm run build
 ```
 
+Output: `dist/`
+
+### Desktop (Electron)
+
+```bash
+npm run build:electron
+```
+
+Output: `release/` - Windows (.exe), macOS (.dmg), Linux (.AppImage)
+
+
+
+## License
+
+MIT
