@@ -41,6 +41,13 @@ const Router = [
         component: AgentPage,
         Layout: null,
     },
+    {
+        name: 'Market',
+        icon: '',
+        path: '/market',
+        component: lazy(() => import('~/components/market')),
+        Layout: null,
+    }
 
 ];
 

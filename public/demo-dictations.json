@@ -1,0 +1,52 @@
+{
+  "demos": [
+    {
+      "id": "demo-1",
+      "name": "Beginner English | Daily Words You’ll Use at Home 🏡 | Comprehensible input",
+      "videoUrl": "https://www.youtube.com/watch?v=ofPPsEXbEKM&t=192s",
+      "videoId": "ofPPsEXbEKM",
+      "primaryLanguage": "en",
+      "captions": [
+        {
+          "language": "en",
+          "languageLabel": "English",
+          "subtitles": "./caption/1.srt"
+        }
+      ],
+      "description": "Beginner friendly video learning English naturally",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "demo-2",
+      "name": "vlog: j’apprends le français🤍📖",
+      "videoUrl": "https://www.youtube.com/watch?v=nvyWUkL1m3Q",
+      "videoId": "nvyWUkL1m3Q",
+      "primaryLanguage": "fr",
+      "captions": [
+        {
+          "language": "fr",
+          "languageLabel": "French",
+          "subtitles": "./caption/2.srt"
+        }
+      ],
+      "description": "Beginner friendly video learning English naturally",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "demo-3",
+      "name": "Why Do You Live in Paris? | Easy French 97",
+      "videoUrl": "https://www.youtube.com/watch?v=YCuU4SjcS2A&t=236s",
+      "videoId": "YCuU4SjcS2A",
+      "primaryLanguage": "en",
+      "captions": [
+        {
+          "language": "fr",
+          "languageLabel": "French",
+          "subtitles": "./caption/3.srt"
+        }
+      ],
+      "description": "Beginner friendly video learning English naturally",
+      "difficulty": "beginner"
+    }
+  ]
+}

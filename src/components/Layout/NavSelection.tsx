@@ -6,7 +6,7 @@ const pathNavigate = [
     { name: "Dictation", path: "/" },
     { name: "Archive", path: "/archive" },
     { name: "Agent", path: "/agent" },
-    { name: "Carbin", path: "/carbin" },
+    // { name: "Carbin", path: "/carbin" },
 ];
 
 // Check if running in Electron
