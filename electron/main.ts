@@ -18,6 +18,25 @@ const store = new Store({
   defaults: {}
 })
 
+// Separate store for API keys (more secure)
+const apiKeyStore = new Store({
+  name: 'api-keys',
+  defaults: {
+    gemini: '',
+    groq: ''
+  }
+})
+
+// Load stored API keys on startup
+const storedGeminiKey = apiKeyStore.get('gemini') as string
+const storedGroqKey = apiKeyStore.get('groq') as string
+if (storedGeminiKey) {
+  gemini.setApiKey(storedGeminiKey)
+}
+if (storedGroqKey) {
+  groq.setApiKey(storedGroqKey)
+}
+
 // AI provider state
 let currentProvider = 'gemini' // 'gemini' or 'groq'
 const aiProviders = [
@@ -187,7 +206,7 @@ ipcMain.handle('set-ai-model', async (_event, providerId: string, modelId: strin
   }
 })
 
-ipcMain.handle('chat-with-ai-stream', async (event, history: Array<{role: string, content: string}>, message: string) => {
+ipcMain.handle('chat-with-ai-stream', async (event, history: Array<{role: string, content: string}>, message: string, systemPrompt?: string) => {
   try {
     let fullResponse = ''
     
@@ -196,9 +215,9 @@ ipcMain.handle('chat-with-ai-stream', async (event, history: Array<{role: string
     }
     
     if (currentProvider === 'gemini') {
-      fullResponse = await gemini.chatWithGeminiStream(history, message, onChunk)
+      fullResponse = await gemini.chatWithGeminiStream(history, message, onChunk, systemPrompt)
     } else if (currentProvider === 'groq') {
-      fullResponse = await groq.chatWithGroqStream(history, message, onChunk)
+      fullResponse = await groq.chatWithGroqStream(history, message, onChunk, systemPrompt)
     } else {
       return { success: false, error: 'Invalid provider' }
     }
@@ -206,6 +225,107 @@ ipcMain.handle('chat-with-ai-stream', async (event, history: Array<{role: string
     return { success: true, data: fullResponse }
   } catch (error) {
     console.error('chat-with-ai-stream error:', error)
+    return { success: false, error: (error as Error).message }
+  }
+})
+
+// API Key Management IPC handlers
+ipcMain.handle('get-api-key-status', async () => {
+  try {
+    const envGeminiKey = process.env.GOOGLE_API_KEY
+    const envGroqKey = process.env.GROQ_API_KEY
+    const storedGeminiKey = apiKeyStore.get('gemini') as string
+    const storedGroqKey = apiKeyStore.get('groq') as string
+
+    return {
+      success: true,
+      data: {
+        gemini: envGeminiKey ? 'env' : (storedGeminiKey ? 'custom' : 'unconfigured'),
+        groq: envGroqKey ? 'env' : (storedGroqKey ? 'custom' : 'unconfigured')
+      }
+    }
+  } catch (error) {
+    console.error('get-api-key-status error:', error)
+    return { success: false, error: 'Failed to get API key status' }
+  }
+})
+
+ipcMain.handle('get-api-keys', async () => {
+  try {
+    return {
+      success: true,
+      data: {
+        gemini: apiKeyStore.get('gemini') as string || '',
+        groq: apiKeyStore.get('groq') as string || ''
+      }
+    }
+  } catch (error) {
+    console.error('get-api-keys error:', error)
+    return { success: false, error: 'Failed to get API keys' }
+  }
+})
+
+ipcMain.handle('set-api-key', async (_event, provider: 'gemini' | 'groq', key: string) => {
+  try {
+    apiKeyStore.set(provider, key)
+    
+    // Update the AI module with the new key
+    if (provider === 'gemini') {
+      gemini.setApiKey(key)
+    } else if (provider === 'groq') {
+      groq.setApiKey(key)
+    }
+    
+    return { success: true }
+  } catch (error) {
+    console.error('set-api-key error:', error)
+    return { success: false, error: 'Failed to set API key' }
+  }
+})
+
+ipcMain.handle('remove-api-key', async (_event, provider: 'gemini' | 'groq') => {
+  try {
+    apiKeyStore.set(provider, '')
+    
+    // Reset the AI module to use env key
+    if (provider === 'gemini') {
+      gemini.setApiKey('')
+    } else if (provider === 'groq') {
+      groq.setApiKey('')
+    }
+    
+    return { success: true }
+  } catch (error) {
+    console.error('remove-api-key error:', error)
+    return { success: false, error: 'Failed to remove API key' }
+  }
+})
+
+ipcMain.handle('test-api-key', async (_event, provider: 'gemini' | 'groq') => {
+  try {
+    if (provider === 'gemini') {
+      await gemini.testConnection()
+    } else if (provider === 'groq') {
+      await groq.testConnection()
+    }
+    return { success: true }
+  } catch (error) {
+    console.error('test-api-key error:', error)
+    return { success: false, error: (error as Error).message }
+  }
+})
+
+// Validate API key without saving (test with provided key)
+ipcMain.handle('validate-api-key', async (_event, provider: 'gemini' | 'groq', key: string) => {
+  try {
+    if (provider === 'gemini') {
+      await gemini.validateKey(key)
+    } else if (provider === 'groq') {
+      await groq.validateKey(key)
+    }
+    return { success: true }
+  } catch (error) {
+    console.error('validate-api-key error:', error)
     return { success: false, error: (error as Error).message }
   }
 })

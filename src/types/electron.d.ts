@@ -55,6 +55,24 @@ interface AIResult {
   error?: string
 }
 
+interface ApiKeyStatusResult {
+  success: boolean
+  data?: {
+    gemini: 'unconfigured' | 'env' | 'custom'
+    groq: 'unconfigured' | 'env' | 'custom'
+  }
+  error?: string
+}
+
+interface ApiKeysResult {
+  success: boolean
+  data?: {
+    gemini: string
+    groq: string
+  }
+  error?: string
+}
+
 interface Window {
   electronAPI: {
     platform: string
@@ -69,8 +87,15 @@ interface Window {
     setAIProvider: (providerId: string) => Promise<AIResult>
     fetchAIModels: (providerId: string) => Promise<AIModelsResult>
     setAIModel: (providerId: string, modelId: string) => Promise<AIResult>
-    chatWithAIStream: (history: Array<{role: string, content: string}>, message: string) => Promise<AIResult>
+    chatWithAIStream: (history: Array<{role: string, content: string}>, message: string, systemPrompt?: string) => Promise<AIResult>
     onAIChatChunk: (callback: (chunk: string) => void) => void
     removeAIChatChunkListener: () => void
+    // API Key management methods
+    getApiKeyStatus: () => Promise<ApiKeyStatusResult>
+    getApiKeys: () => Promise<ApiKeysResult>
+    setApiKey: (provider: 'gemini' | 'groq', key: string) => Promise<AIResult>
+    removeApiKey: (provider: 'gemini' | 'groq') => Promise<AIResult>
+    testApiKey: (provider: 'gemini' | 'groq') => Promise<AIResult>
+    validateApiKey: (provider: 'gemini' | 'groq', key: string) => Promise<AIResult>
   }
 }

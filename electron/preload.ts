@@ -46,12 +46,25 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('fetch-ai-models', providerId),
   setAIModel: (providerId: string, modelId: string) =>
     ipcRenderer.invoke('set-ai-model', providerId, modelId),
-  chatWithAIStream: (history: Array<{role: string, content: string}>, message: string) =>
-    ipcRenderer.invoke('chat-with-ai-stream', history, message),
+  chatWithAIStream: (history: Array<{role: string, content: string}>, message: string, systemPrompt?: string) =>
+    ipcRenderer.invoke('chat-with-ai-stream', history, message, systemPrompt),
   onAIChatChunk: (callback: (chunk: string) => void) => {
     ipcRenderer.on('ai-chat-chunk', (_event, chunk) => callback(chunk))
   },
   removeAIChatChunkListener: () => {
     ipcRenderer.removeAllListeners('ai-chat-chunk')
   },
+  // API Key management methods
+  getApiKeyStatus: () =>
+    ipcRenderer.invoke('get-api-key-status'),
+  getApiKeys: () =>
+    ipcRenderer.invoke('get-api-keys'),
+  setApiKey: (provider: 'gemini' | 'groq', key: string) =>
+    ipcRenderer.invoke('set-api-key', provider, key),
+  removeApiKey: (provider: 'gemini' | 'groq') =>
+    ipcRenderer.invoke('remove-api-key', provider),
+  testApiKey: (provider: 'gemini' | 'groq') =>
+    ipcRenderer.invoke('test-api-key', provider),
+  validateApiKey: (provider: 'gemini' | 'groq', key: string) =>
+    ipcRenderer.invoke('validate-api-key', provider, key),
 })

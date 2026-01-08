@@ -1,9 +1,9 @@
 import React from 'react';
 import {
     Plus,
-    Settings,
-    MoreHorizontal,
-    Maximize2,
+    // Settings,
+    // MoreHorizontal,
+    // Maximize2,
     ArrowLeft,
     Trash2,
 } from 'lucide-react';
@@ -16,7 +16,7 @@ interface ChatHeaderProps {
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({ messages, onClearChat }) => {
     return (
-        <div className="flex items-center justify-between px-4 py-2 bg-[rgb(32,32,32)] border-b border-[rgb(56,56,56)]">
+        <div className="flex items-center justify-between px-4 py-2 bg-[rgb(32,32,32)] border-b border-[rgb(56,56,56)] rounded-lg">
             <div className="flex items-center gap-2">
                 <button className="p-1 hover:bg-[rgb(49,49,49)] rounded transition-colors text-[rgb(240,240,240)]">
                     <ArrowLeft size={18} />
@@ -37,16 +37,16 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ messages, onClearChat })
                 >
                     <Plus size={16} />
                 </button>
-                <button className="p-1.5 hover:bg-[rgb(49,49,49)] rounded transition-colors">
-                    <Settings size={16} />
-                </button>
-                <button className="p-1.5 hover:bg-[rgb(49,49,49)] rounded transition-colors">
-                    <MoreHorizontal size={16} />
-                </button>
                 <div className="w-px h-4 bg-[rgb(56,56,56)] mx-1" />
-                <button className="p-1.5 hover:bg-[rgb(49,49,49)] rounded transition-colors">
+                {/* <button className="p-1.5 hover:bg-[rgb(49,49,49)] rounded transition-colors">
+                    <Settings size={16} />
+                </button> */}
+                {/* <button className="p-1.5 hover:bg-[rgb(49,49,49)] rounded transition-colors">
+                    <MoreHorizontal size={16} />
+                </button> */}
+                {/* <button className="p-1.5 hover:bg-[rgb(49,49,49)] rounded transition-colors">
                     <Maximize2 size={16} />
-                </button>
+                </button> */}
                 {messages.length > 0 && (
                     <button
                         onClick={onClearChat}

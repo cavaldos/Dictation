@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Mic, Send, Loader2 } from "lucide-react";
-import type { Message, AIModel, AIProvider } from './box/types';
+import type { Message, AIModel, AIProvider, ChatMode, DictionaryResponse } from './box/types';
+import { CHAT_MODES } from './box/types';
 import { ChatHeader } from './box/ChatHeader';
 import { ChatMessage } from './box/ChatMessage';
 import { EmptyState } from './box/EmptyState';
-import { ProviderSelector, ModelSelector } from './box/Selectors';
+import { ProviderSelector, ModelSelector, ModeSelector } from './box/Selectors';
+import DictionaryTable from './box/DictionaryTable';
 
 const ChatBot: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -21,6 +23,11 @@ const ChatBot: React.FC = () => {
     const [selectedModel, setSelectedModel] = useState<string>('');
     const [showModelDropdown, setShowModelDropdown] = useState(false);
     const [isLoadingModels, setIsLoadingModels] = useState(false);
+
+    // Mode state
+    const [currentMode, setCurrentMode] = useState<ChatMode>('chat');
+    const [showModeDropdown, setShowModeDropdown] = useState(false);
+    const [showCommandPalette, setShowCommandPalette] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -94,6 +101,11 @@ const ChatBot: React.FC = () => {
         return model?.name || selectedModel || 'Select Model';
     };
 
+    const getSystemPrompt = (): string | undefined => {
+        const mode = CHAT_MODES.find(m => m.id === currentMode);
+        return mode?.systemPrompt;
+    };
+
     const handleProviderChange = async (providerId: string) => {
         try {
             const result = await window.electronAPI.setAIProvider(providerId);
@@ -127,14 +139,61 @@ const ChatBot: React.FC = () => {
         setShowModelDropdown(false);
     };
 
+    const handleModeChange = (mode: ChatMode) => {
+        setCurrentMode(mode);
+        setShowModeDropdown(false);
+        setShowCommandPalette(false);
+    };
+
+    const parseDictionaryResponse = (content: string): DictionaryResponse | null => {
+        try {
+            // Try to extract JSON from the response
+            let jsonStr = content.trim();
+            
+            // Remove markdown code blocks if present
+            if (jsonStr.startsWith('```json')) {
+                jsonStr = jsonStr.slice(7);
+            } else if (jsonStr.startsWith('```')) {
+                jsonStr = jsonStr.slice(3);
+            }
+            if (jsonStr.endsWith('```')) {
+                jsonStr = jsonStr.slice(0, -3);
+            }
+            jsonStr = jsonStr.trim();
+            
+            const parsed = JSON.parse(jsonStr);
+            if (parsed && parsed.words && Array.isArray(parsed.words)) {
+                return parsed as DictionaryResponse;
+            }
+        } catch (e) {
+            console.error('Failed to parse dictionary response:', e);
+        }
+        return null;
+    };
+
     const handleSendMessage = async () => {
         if (!inputValue.trim() || isLoading) return;
+
+        // Check for "/" commands
+        if (inputValue.startsWith('/')) {
+            const command = inputValue.slice(1).toLowerCase().trim();
+            if (command === 'dict' || command === 'dictionary') {
+                setCurrentMode('dictionary');
+                setInputValue('');
+                return;
+            } else if (command === 'chat') {
+                setCurrentMode('chat');
+                setInputValue('');
+                return;
+            }
+        }
 
         const userMessage: Message = {
             id: Date.now().toString(),
             type: 'user',
             content: inputValue,
             timestamp: new Date(),
+            mode: currentMode,
         };
 
         setMessages(prev => [...prev, userMessage]);
@@ -149,16 +208,20 @@ const ChatBot: React.FC = () => {
             timestamp: new Date(),
             isStreaming: true,
             model: getCurrentModelName(),
+            mode: currentMode,
         };
         setMessages(prev => [...prev, assistantMessage]);
 
         try {
-            const history = messages.map(msg => ({
-                role: msg.type as 'user' | 'assistant',
-                content: msg.content,
-            }));
+            const history = messages
+                .filter(msg => msg.mode === currentMode || !msg.mode)
+                .map(msg => ({
+                    role: msg.type as 'user' | 'assistant',
+                    content: msg.content,
+                }));
 
             let streamedContent = '';
+            const systemPrompt = getSystemPrompt();
 
             if (window.electronAPI?.onAIChatChunk) {
                 window.electronAPI.onAIChatChunk((chunk: string) => {
@@ -171,7 +234,7 @@ const ChatBot: React.FC = () => {
                 });
             }
 
-            const result = await window.electronAPI.chatWithAIStream(history, inputValue);
+            const result = await window.electronAPI.chatWithAIStream(history, inputValue, systemPrompt);
 
             if (window.electronAPI?.removeAIChatChunkListener) {
                 window.electronAPI.removeAIChatChunkListener();
@@ -179,9 +242,19 @@ const ChatBot: React.FC = () => {
 
             if (result.success) {
                 const finalContent = result.data || streamedContent;
+                
+                // Parse dictionary response if in dictionary mode
+                let dictionaryData: DictionaryResponse | undefined;
+                if (currentMode === 'dictionary') {
+                    const parsed = parseDictionaryResponse(finalContent);
+                    if (parsed) {
+                        dictionaryData = parsed;
+                    }
+                }
+                
                 setMessages(prev => prev.map(msg =>
                     msg.id === assistantMessageId
-                        ? { ...msg, content: finalContent, isStreaming: false }
+                        ? { ...msg, content: finalContent, isStreaming: false, dictionaryData }
                         : msg
                 ));
             } else {
@@ -210,6 +283,18 @@ const ChatBot: React.FC = () => {
         }
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const value = e.target.value;
+        setInputValue(value);
+        
+        // Show command palette when typing "/"
+        if (value === '/') {
+            setShowCommandPalette(true);
+        } else if (!value.startsWith('/')) {
+            setShowCommandPalette(false);
+        }
+    };
+
     const handleClearChat = () => {
         setMessages([]);
     };
@@ -221,6 +306,7 @@ const ChatBot: React.FC = () => {
         const previousUserMessage = messages[messageIndex - 1];
         if (previousUserMessage.type !== 'user') return;
 
+        const messageMode = messages[messageIndex].mode || 'chat';
         const newMessages = messages.slice(0, messageIndex);
         setMessages(newMessages);
         setIsLoading(true);
@@ -233,6 +319,7 @@ const ChatBot: React.FC = () => {
             timestamp: new Date(),
             isStreaming: true,
             model: getCurrentModelName(),
+            mode: messageMode,
         };
         setMessages(prev => [...prev, assistantMessage]);
 
@@ -243,6 +330,8 @@ const ChatBot: React.FC = () => {
             }));
 
             let streamedContent = '';
+            const modeConfig = CHAT_MODES.find(m => m.id === messageMode);
+            const systemPrompt = modeConfig?.systemPrompt;
 
             if (window.electronAPI?.onAIChatChunk) {
                 window.electronAPI.onAIChatChunk((chunk: string) => {
@@ -255,16 +344,26 @@ const ChatBot: React.FC = () => {
                 });
             }
 
-            const result = await window.electronAPI.chatWithAIStream(history, previousUserMessage.content);
+            const result = await window.electronAPI.chatWithAIStream(history, previousUserMessage.content, systemPrompt);
 
             if (window.electronAPI?.removeAIChatChunkListener) {
                 window.electronAPI.removeAIChatChunkListener();
             }
 
             if (result.success) {
+                const finalContent = result.data || streamedContent;
+                
+                let dictionaryData: DictionaryResponse | undefined;
+                if (messageMode === 'dictionary') {
+                    const parsed = parseDictionaryResponse(finalContent);
+                    if (parsed) {
+                        dictionaryData = parsed;
+                    }
+                }
+                
                 setMessages(prev => prev.map(msg =>
                     msg.id === assistantMessageId
-                        ? { ...msg, content: result.data || streamedContent, isStreaming: false }
+                        ? { ...msg, content: finalContent, isStreaming: false, dictionaryData }
                         : msg
                 ));
             } else {
@@ -281,8 +380,26 @@ const ChatBot: React.FC = () => {
         }
     };
 
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        const word = e.dataTransfer.getData('text/plain');
+        if (word) {
+            const newText = inputValue ? `${inputValue} ${word}` : word;
+            setInputValue(newText);
+            textareaRef.current?.focus();
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+    };
+
+    const handleSaveWordToNotes = (word: string) => {
+        console.log('Saved word to notes:', word);
+    };
+
     return (
-        <div className="w-full h-full flex flex-col bg-[rgb(32,32,32)]">
+        <div className="w-full h-full flex flex-col bg-[rgb(32,32,32)] border border-[rgb(56,56,56)] rounded-lg">
             {/* Header */}
             <ChatHeader
                 messages={messages}
@@ -299,12 +416,21 @@ const ChatBot: React.FC = () => {
                 ) : (
                     messages.map((message) => (
                         <div key={message.id} className="space-y-2">
-                            <ChatMessage
-                                message={message}
-                                currentModelName={getCurrentModelName()}
-                                isLoading={isLoading}
-                                onRegenerate={handleRegenerate}
-                            />
+                            {message.type === 'assistant' && message.mode === 'dictionary' && message.dictionaryData ? (
+                                <div className="ml-8">
+                                    <DictionaryTable 
+                                        data={message.dictionaryData} 
+                                        onSaveToNotes={handleSaveWordToNotes}
+                                    />
+                                </div>
+                            ) : (
+                                <ChatMessage
+                                    message={message}
+                                    currentModelName={getCurrentModelName()}
+                                    isLoading={isLoading}
+                                    onRegenerate={handleRegenerate}
+                                />
+                            )}
                         </div>
                     ))
                 )}
@@ -313,15 +439,64 @@ const ChatBot: React.FC = () => {
             </div>
 
             {/* Input area */}
-            <div className="border-t border-[rgb(56,56,56)] p-3 space-y-2 bg-[rgb(32,32,32)]">
+            <div className="border-t border-[rgb(56,56,56)] rounded-b-md p-3 space-y-2 bg-[rgb(32,32,32)]">
+                {/* Command Palette */}
+                {showCommandPalette && (
+                    <div className="absolute bottom-24 left-4 w-64 bg-[rgb(40,40,40)] border border-[rgb(56,56,56)] rounded-lg shadow-xl z-50 overflow-hidden">
+                        <div className="p-2 border-b border-[rgb(56,56,56)]">
+                            <p className="text-xs text-[rgb(142,142,142)] font-medium">Commands</p>
+                        </div>
+                        <button
+                            onClick={() => {
+                                setCurrentMode('dictionary');
+                                setInputValue('');
+                                setShowCommandPalette(false);
+                            }}
+                            className="w-full px-3 py-2 text-left hover:bg-[rgb(49,49,49)] transition-colors flex items-center gap-3"
+                        >
+                            <span className="text-base">📖</span>
+                            <div>
+                                <p className="text-sm text-[rgb(240,240,240)]">/dict</p>
+                                <p className="text-xs text-[rgb(142,142,142)]">Switch to Dictionary mode</p>
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setCurrentMode('chat');
+                                setInputValue('');
+                                setShowCommandPalette(false);
+                            }}
+                            className="w-full px-3 py-2 text-left hover:bg-[rgb(49,49,49)] transition-colors flex items-center gap-3"
+                        >
+                            <span className="text-base">💬</span>
+                            <div>
+                                <p className="text-sm text-[rgb(240,240,240)]">/chat</p>
+                                <p className="text-xs text-[rgb(142,142,142)]">Switch to Chat mode</p>
+                            </div>
+                        </button>
+                    </div>
+                )}
+
+                {/* Mode indicator */}
+                {currentMode === 'dictionary' && (
+                    <div className="flex items-center gap-2 px-2 py-1 bg-purple-500/10 border border-purple-500/20 rounded-md">
+                        <span className="text-sm">📖</span>
+                        <span className="text-xs text-purple-400">Dictionary Mode - Enter words to look up</span>
+                    </div>
+                )}
+
                 {/* Input field */}
-                <div className="relative bg-[rgb(25,25,25)] rounded-lg border border-[rgb(56,56,56)] focus-within:border-gray-600 transition-colors">
+                <div 
+                    className="relative bg-[rgb(25,25,25)] rounded-lg border border-[rgb(56,56,56)] focus-within:border-gray-600 transition-colors"
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                >
                     <textarea
                         ref={textareaRef}
                         value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
+                        onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ask me anything..."
+                        placeholder={currentMode === 'dictionary' ? "Enter words to look up (e.g., happy, sad, run)..." : "Ask me anything... (type / for commands)"}
                         disabled={isLoading}
                         className="w-full bg-transparent px-3 py-2.5 text-sm text-[rgb(240,240,240)] placeholder-[rgb(142,142,142)] resize-none focus:outline-none disabled:opacity-50"
                         rows={3}
@@ -331,6 +506,13 @@ const ChatBot: React.FC = () => {
                 {/* Controls */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
+                        <ModeSelector
+                            currentMode={currentMode}
+                            showDropdown={showModeDropdown}
+                            onToggleDropdown={() => setShowModeDropdown(!showModeDropdown)}
+                            onModeChange={handleModeChange}
+                        />
+
                         <ProviderSelector
                             providers={providers}
                             currentProvider={currentProvider}

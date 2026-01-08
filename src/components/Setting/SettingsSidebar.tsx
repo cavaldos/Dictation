@@ -6,7 +6,8 @@ import {
   Target, 
   Gauge,
   Keyboard,
-  Info
+  Info,
+  Cpu
 } from 'lucide-react';
 
 export type SettingsTab = 
@@ -16,6 +17,7 @@ export type SettingsTab =
   | 'practice' 
   | 'playback' 
   | 'shortcuts' 
+  | 'ai'
   | 'about';
 
 interface SidebarItem {
@@ -32,6 +34,7 @@ const sidebarItems: SidebarItem[] = [
   { id: 'practice', label: 'Practice', icon: <Target size={18} /> },
   { id: 'playback', label: 'Playback', icon: <Gauge size={18} /> },
   { id: 'shortcuts', label: 'Shortcuts', icon: <Keyboard size={18} /> },
+  { id: 'ai', label: 'AI Connection', icon: <Cpu size={18} />, section: 'Integration' },
   { id: 'about', label: 'About', icon: <Info size={18} /> },
 ];
 

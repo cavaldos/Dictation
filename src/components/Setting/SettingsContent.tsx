@@ -7,6 +7,7 @@ import {
   PracticeFeature,
   PlaybackFeature,
   ShortcutsFeature,
+  AIConnectionFeature,
   AboutFeature,
 } from './features';
 
@@ -29,6 +30,8 @@ const SettingsContent: React.FC<SettingsContentProps> = ({ activeTab }) => {
         return <PlaybackFeature />;
       case 'shortcuts':
         return <ShortcutsFeature />;
+      case 'ai':
+        return <AIConnectionFeature />;
       case 'about':
         return <AboutFeature />;
       default:
@@ -44,6 +47,7 @@ const SettingsContent: React.FC<SettingsContentProps> = ({ activeTab }) => {
       practice: 'Practice',
       playback: 'Playback',
       shortcuts: 'Shortcuts',
+      ai: 'AI Connection',
       about: 'About',
     };
     return titles[activeTab];

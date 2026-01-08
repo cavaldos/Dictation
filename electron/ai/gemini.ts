@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 let genAI: GoogleGenerativeAI | null = null;
 let currentModel = 'gemini-2.0-flash-exp';
+let customApiKey = '';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -9,16 +10,62 @@ import path from 'node:path';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
+function getApiKey(): string {
+  // Priority: custom key > env key
+  return customApiKey || process.env.GOOGLE_API_KEY || '';
+}
+
+export function setApiKey(key: string) {
+  customApiKey = key;
+  genAI = null; // Reset to reinitialize with new key
+  console.log('Gemini API key updated');
+}
 
 function initializeGenAI() {
   if (!genAI) {
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getApiKey();
     if (!apiKey) {
-      throw new Error('GOOGLE_API_KEY is not set in environment variables');
+      throw new Error('GOOGLE_API_KEY is not set. Please configure it in Settings or .env file.');
     }
     genAI = new GoogleGenerativeAI(apiKey);
   }
   return genAI;
+}
+
+export async function testConnection() {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error('No API key configured');
+  }
+  
+  // Test by listing models
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+  );
+  
+  if (!response.ok) {
+    throw new Error(`Invalid API key: ${response.statusText}`);
+  }
+  
+  return true;
+}
+
+// Validate a specific key without saving
+export async function validateKey(key: string) {
+  if (!key) {
+    throw new Error('No API key provided');
+  }
+  
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`
+  );
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || `Invalid API key: ${response.statusText}`);
+  }
+  
+  return true;
 }
 
 export function setModel(modelId: string) {
@@ -32,9 +79,9 @@ export function getModel() {
 
 export async function listGeminiModels() {
   try {
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getApiKey();
     if (!apiKey) {
-      throw new Error('GOOGLE_API_KEY is not set in environment variables');
+      throw new Error('GOOGLE_API_KEY is not set. Please configure it in Settings or .env file.');
     }
 
     const response = await fetch(
@@ -75,11 +122,15 @@ function formatModelName(name: string) {
 export async function chatWithGeminiStream(
   history: Array<{role: string, content: string}>, 
   message: string, 
-  onChunk: (chunk: string) => void
+  onChunk: (chunk: string) => void,
+  systemPrompt?: string
 ) {
   try {
     const ai = initializeGenAI();
-    const model = ai.getGenerativeModel({ model: currentModel });
+    const model = ai.getGenerativeModel({ 
+      model: currentModel,
+      systemInstruction: systemPrompt || undefined
+    });
 
     const formattedHistory = history.map(msg => ({
       role: msg.role === 'assistant' ? 'model' : msg.role,
